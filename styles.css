@@ -1,0 +1,15 @@
+    /* styles.css */
+    body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+    }
+    /* Custom Tailwind colors for better consistency without needing tailwind.config.js */
+    :root {
+        --pmi-blue: #0056A0;
+        --pmi-gold: #C8A96A;
+    }
+    .text-pmi-blue { color: var(--pmi-blue); }
+    .focus\:border-pmi-blue:focus { border-color: var(--pmi-blue); }
+    .text-pmi-gold { color: var(--pmi-gold); }
+    .focus\:border-pmi-gold:focus { border-color: var(--pmi-gold); }
+    
