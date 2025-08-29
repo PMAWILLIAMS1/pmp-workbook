@@ -1,1 +1,1 @@
-# pmp-workbook
+# pmp-blueprint
