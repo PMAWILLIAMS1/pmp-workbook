@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PMP Blueprint™ Workbook</title>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind config (define before CDN script) -->
+    <script>
+      window.tailwind = {
+        theme: {
+          extend: {
+            colors: {
+              pmi: { blue: "#0056A0", gold: "#C8A96A" },
+            },
+            borderRadius: { "2xl": "1rem" },
+          },
+        },
+      };
+    </script>
+    <!-- Tailwind CDN (pinned) with forms + typography plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+          sans-serif;
+      }
+      /* Print-friendly styling */
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        .shadow-xl,
+        .shadow-lg,
+        .shadow-md {
+          box-shadow: none !important;
+        }
+        body,
+        main {
+          background: white !important;
+        }
+        a[href]::after {
+          content: " (" attr(href) ")";
+          font-size: 0.8em;
+        }
+        /* Ensure the active page is visible */
+        .page {
+          display: none !important;
+        }
+        .page.active {
+          display: block !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:bg-white focus:text-pmi-blue focus:px-3 focus:py-2 focus:rounded-md focus:shadow"
+      >Skip to content</a
+    >
+
+    <div id="root"></div>
+
+    <!-- React (production UMD) pinned -->
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
+      crossorigin
+    ></script>
+    <!-- Babel (pinned) for JSX in the browser -->
+    <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      // Lightweight icon primitives (inline SVGs so we avoid extra deps)
+      const Icon = ({ children, className, size = 22, style }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+          style={style}
+        >
+          {children}
+        </svg>
+      );
+      const BookOpen = (p) => (
+        <Icon {...p}>
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </Icon>
+      );
+      const ClipboardList = (p) => (
+        <Icon {...p}>
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+          <path d="M12 11h4"></path>
+          <path d="M12 16h4"></path>
+          <path d="M8 11h.01"></path>
+          <path d="M8 16h.01"></path>
+        </Icon>
+      );
+      const CheckCircle = (p) => (
+        <Icon {...p}>
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <path d="M22 4L12 14.01l-3-3"></path>
+        </Icon>
+      );
+      const BarChart2 = (p) => (
+        <Icon {...p}>
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </Icon>
+      );
+      const ListIcon = (p) => (
+        <Icon {...p}>
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </Icon>
+      );
+      const FileText = (p) => (
+        <Icon {...p}>
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+          <path d="M10 9H8"></path>
+          <path d="M16 13H8"></path>
+          <path d="M16 17H8"></path>
+        </Icon>
+      );
+      const Clock = (p) => (
+        <Icon {...p}>
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </Icon>
+      );
+      const Briefcase = (p) => (
+        <Icon {...p}>
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 2h-8a2 2 0 0 0-2 2v3h12V4a2 2 0 0 0-2-2z"></path>
+        </Icon>
+      );
+      const Users = (p) => (
+        <Icon {...p}>
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </Icon>
+      );
+      const MessageSquare = (p) => (
+        <Icon {...p}>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </Icon>
+      );
+      const FileCheck = (p) => (
+        <Icon {...p}>
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+          <path d="M9 18l3 3 5-5"></path>
+        </Icon>
+      );
+      const Menu = (p) => (
+        <Icon {...p}>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </Icon>
+      );
+
+      function App() {
+        const [currentPage, setCurrentPage] = useState("cover");
+        const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+        const [formData, setFormData] = useState(() => ({
+          author: "",
+          eduSecondaryChecked: false,
+          eduSecondaryType: "",
+          exp60MonthsChecked: false,
+          eduFourYearChecked: false,
+          exp36MonthsChecked: false,
+          edu35HoursChecked: false,
+          capmChecked: false,
+          eligibilityNotes: "",
+          projectTitle1: "",
+          projectDates1: "",
+          projectOrganization1: "",
+          projectMethodology1: "",
+          projectTeamSize1: "",
+          projectBudget1: "",
+          projectObjective1: "",
+          yourRole1: "",
+          pgInitiating1: "",
+          pgPlanning1: "",
+          pgExecuting1: "",
+          pgMonitoringControlling1: "",
+          pgClosing1: "",
+          outcomeDeliverables1: "",
+          supervisorName1: "",
+          supervisorContact1: "",
+          projectReflection1: "",
+          auditSupervisorFormsChecked: false,
+          auditEducationCertificatesChecked: false,
+          audit35HourCertificateChecked: false,
+          auditCapmCertificateChecked: false,
+          auditCompleteApplicationChecked: false,
+          auditNotes: "",
+          nTProjectTitle1: "",
+          nTProjectDates1: "",
+          nTOrganization1: "",
+          nTYourRole1: "",
+          nTPGInitiating1: "",
+          nTPGPlanning1: "",
+          nTPGExecuting1: "",
+          nTPGMonitoringControlling1: "",
+          nTPGClosing1: "",
+          nTReflection1: "",
+          studyPlanOption: "8-week",
+          studyWeek1: "",
+          studyWeek2: "",
+          studyWeek3: "",
+          studyWeek4: "",
+          studyWeek5: "",
+          studyWeek6: "",
+          studyWeek7: "",
+          studyWeek8: "",
+          studyWeek9: "",
+          studyWeek10: "",
+          studyWeek11: "",
+          studyWeek12: "",
+          studyPlanReflection: "",
+          examDayOnlineChecked: false,
+          examDayInPersonChecked: false,
+          examDayValidIdChecked: false,
+          examDayConfirmationEmailChecked: false,
+          examDayGoodSleepChecked: false,
+          examDayHealthyBreakfastChecked: false,
+          examDayManageTimeChecked: false,
+          examDayTakeBreaksChecked: false,
+          examDayTrustInstinctsChecked: false,
+          examDayReflection: "",
+          bonusReflection: "",
+          // dynamic done flags for study weeks will be added on demand
+        }));
+
+        // Sections
+        const sections = useMemo(
+          () => [
+            { id: "cover", title: "Cover Page", icon: BookOpen },
+            { id: "toc", title: "Table of Contents", icon: ListIcon },
+            {
+              id: "eligibility",
+              title: "1. PMP Exam Requirements and Eligibility",
+              icon: ClipboardList,
+            },
+            {
+              id: "audits",
+              title: "2. Surviving Application Audits",
+              icon: FileCheck,
+            },
+            {
+              id: "non-traditional",
+              title: "3. Using Non-Traditional Experience to Qualify",
+              icon: Briefcase,
+            },
+            {
+              id: "exam-prep",
+              title: "4. Preparing for the Exam",
+              icon: BarChart2,
+            },
+            { id: "exam-day", title: "5. Exam Day", icon: Clock },
+            {
+              id: "bonus",
+              title: "6. Bonus: Cert Comparison, Resources & FAQs",
+              icon: MessageSquare,
+            },
+            { id: "appendix", title: "7. Appendix: Links", icon: FileText },
+          ],
+          []
+        );
+
+        // Load from localStorage once
+        useEffect(() => {
+          try {
+            const saved = localStorage.getItem("pmpWorkbook");
+            if (saved) setFormData((fd) => ({ ...fd, ...JSON.parse(saved) }));
+          } catch {
+            /* ignore */
+          }
+        }, []);
+
+        // Autosave (debounced)
+        useEffect(() => {
+          const t = setTimeout(() => {
+            try {
+              localStorage.setItem("pmpWorkbook", JSON.stringify(formData));
+            } catch {}
+          }, 400);
+          return () => clearTimeout(t);
+        }, [formData]);
+
+        // Hash routing
+        useEffect(() => {
+          const initial = window.location.hash.replace("#", "") || "cover";
+          if (sections.some((s) => s.id === initial)) setCurrentPage(initial);
+          const onHash = () => {
+            const id = window.location.hash.replace("#", "");
+            if (sections.some((s) => s.id === id)) setCurrentPage(id);
+          };
+          window.addEventListener("hashchange", onHash);
+          return () => window.removeEventListener("hashchange", onHash);
+        }, [sections]);
+        useEffect(() => {
+          const target = `#${currentPage}`;
+          if (window.location.hash !== target) {
+            window.history.replaceState(null, "", target);
+          }
+        }, [currentPage]);
+
+        // Focus management
+        const headingRef = useRef(null);
+        useEffect(() => {
+          headingRef.current?.focus();
+        }, [currentPage]);
+
+        // Handlers
+        const handleInputChange = (e) => {
+          const { name, value, type, checked } = e.target;
+          setFormData((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+          }));
+        };
+
+        const weeksCount =
+          formData.studyPlanOption === "6-week"
+            ? 6
+            : formData.studyPlanOption === "8-week"
+            ? 8
+            : 12;
+
+        const NavLink = ({ id, title, IconComp }) => (
+          <a
+            href={`#${id}`}
+            onClick={() => setCurrentPage(id)}
+            aria-current={currentPage === id ? "page" : undefined}
+            className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+              currentPage === id
+                ? "bg-gray-200 font-semibold text-pmi-blue"
+                : "hover:bg-gray-100"
+            }`}
+          >
+            <IconComp className="mr-3 text-pmi-gold" />
+            <span>{title}</span>
+            {/* status chip if page has data */}
+            <span className="ml-auto text-xs rounded-full px-2 py-0.5 bg-gray-100 text-gray-500">
+              {pageHasData(id) ? "✓" : ""}
+            </span>
+          </a>
+        );
+
+        function pageHasData(id) {
+          const keys = {
+            eligibility: [
+              "eduSecondaryChecked",
+              "exp60MonthsChecked",
+              "eligibilityNotes",
+              "eduFourYearChecked",
+              "exp36MonthsChecked",
+              "edu35HoursChecked",
+              "capmChecked",
+              "eduSecondaryType",
+            ],
+            audits: [
+              "auditSupervisorFormsChecked",
+              "auditEducationCertificatesChecked",
+              "audit35HourCertificateChecked",
+              "auditCapmCertificateChecked",
+              "auditCompleteApplicationChecked",
+              "auditNotes",
+            ],
+            "non-traditional": [
+              "nTProjectTitle1",
+              "nTOrganization1",
+              "nTYourRole1",
+              "nTReflection1",
+            ],
+            "exam-prep": [
+              "studyPlanOption",
+              "studyPlanReflection",
+              "studyWeek1",
+              "studyWeek2",
+            ],
+            "exam-day": [
+              "examDayOnlineChecked",
+              "examDayInPersonChecked",
+              "examDayValidIdChecked",
+              "examDayReflection",
+            ],
+            bonus: ["bonusReflection"],
+            appendix: [],
+            cover: ["author"],
+          };
+          const list = keys[id] || [];
+          return list.some((k) => !!formData[k]);
+        }
+
+        function exportJSON() {
+          const blob = new Blob([JSON.stringify(formData, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "pmp-workbook.json";
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+
+        function importJSON(file) {
+          if (!file) return;
+          file.text().then((text) => {
+            try {
+              setFormData(JSON.parse(text));
+            } catch {
+              alert("Invalid JSON");
+            }
+          });
+        }
+
+        function printSection(id) {
+          setCurrentPage(id);
+          setTimeout(() => window.print(), 50);
+        }
+
+        const scrollPositions = useRef({});
+
+        const PageWrapper = ({ id, children }) => {
+          const isActive = currentPage === id;
+          const scrollerRef = useRef(null);
+          useEffect(() => {
+            const el = scrollerRef.current;
+            if (!el) return;
+            // restore scroll position
+            el.scrollTop = scrollPositions.current[id] || 0;
+            const onScroll = () => {
+              scrollPositions.current[id] = el.scrollTop;
+            };
+            el.addEventListener("scroll", onScroll);
+            return () => el.removeEventListener("scroll", onScroll);
+          }, [id, currentPage]);
+
+          return (
+            <section
+              aria-labelledby={`${id}-heading`}
+              className={`page absolute inset-0 w-full h-full p-6 md:p-10 transition-all duration-500 ${
+                isActive
+                  ? "active translate-x-0 opacity-100"
+                  : "pointer-events-none translate-x-8 opacity-0"
+              }`}
+            >
+              <div
+                className="bg-white h-full overflow-y-auto rounded-2xl border border-gray-100 shadow-xl"
+                ref={scrollerRef}
+              >
+                <div className="p-6 md:p-10">{children}</div>
+              </div>
+            </section>
+          );
+        };
+
+        const Header = ({ title }) => (
+          <h2
+            id={`${currentPage}-heading`}
+            ref={headingRef}
+            tabIndex="-1"
+            className="text-3xl md:text-4xl font-extrabold text-pmi-blue mb-6"
+          >
+            {title}
+          </h2>
+        );
+
+        return (
+          <div className="min-h-screen flex flex-col md:flex-row gap-4 p-4">
+            {/* Mobile top bar */}
+            <div className="md:hidden sticky top-0 z-50 bg-white rounded-xl shadow p-3 flex items-center justify-between no-print">
+              <button
+                onClick={() => setIsSidebarOpen((s) => !s)}
+                className="p-2 rounded-lg"
+                aria-label="Open menu"
+              >
+                <Menu className="text-gray-600" />
+              </button>
+              <span className="text-lg font-bold text-pmi-blue">
+                PMP Blueprint™
+              </span>
+              <span className="w-8" />
+            </div>
+
+            {/* Sidebar */}
+            <aside
+              className={`no-print bg-white rounded-2xl shadow-lg p-6 w-full md:w-72 md:block ${
+                isSidebarOpen ? "block" : "hidden md:block"
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="text-pmi-gold" />
+                <h1 className="text-2xl font-extrabold text-pmi-blue">
+                  PMP Blueprint™
+                </h1>
+              </div>
+              <nav aria-label="Section navigation">
+                <ul className="space-y-2">
+                  {sections.map((s) => (
+                    <li key={s.id}>
+                      <NavLink id={s.id} title={s.title} IconComp={s.icon} />
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+              <div className="mt-6 space-y-2">
+                <button
+                  onClick={exportJSON}
+                  className="w-full rounded-lg bg-pmi-blue text-white py-2 font-semibold"
+                >
+                  Export Data
+                </button>
+
+                <details className="mt-2">
+                  <summary className="cursor-pointer font-semibold">
+                    Print
+                  </summary>
+                  <div className="grid grid-cols-2 gap-2 pt-2">
+                    {sections.map((s) => (
+                      <button
+                        key={`print-${s.id}`}
+                        onClick={() => printSection(s.id)}
+                        className="rounded-lg border px-2 py-1 text-sm hover:bg-gray-50"
+                        title={`Print ${s.title}`}
+                      >
+                        Print {s.id === "toc" ? "TOC" : s.title.split(".")[0]}
+                      </button>
+                    ))}
+                  </div>
+                </details>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("pmpWorkbook");
+                    location.reload();
+                  }}
+                  className="w-full rounded-lg border py-2 text-sm"
+                >
+                  Reset Workbook
+                </button>
+              </div>
+            </aside>
+
+            {/* Main content */}
+            <main
+              id="main"
+              className="relative flex-1 min-h-[70vh] md:min-h-[calc(100vh-2rem)] rounded-2xl shadow-xl overflow-hidden bg-transparent"
+            >
+              {/* Cover */}
+              <PageWrapper id="cover">
+                <Header title="Cover Page" />
+                <div className="flex flex-col items-center text-center">
+                  <h1 className="text-4xl md:text-6xl font-extrabold text-pmi-blue">
+                    PMP Blueprint™
+                  </h1>
+                  <h2 className="text-xl md:text-3xl font-semibold mt-3 text-gray-800">
+                    Application Success Workbook
+                  </h2>
+                  <p className="text-gray-600 mt-2">
+                    Mastering Your PMP Application and Exam Preparation
+                  </p>
+                  <div className="mt-8 w-full max-w-sm">
+                    <label
+                      htmlFor="author"
+                      className="block text-gray-700 font-semibold mb-2"
+                    >
+                      Author/Publisher
+                    </label>
+                    <input
+                      id="author"
+                      name="author"
+                      value={formData.author}
+                      onChange={handleInputChange}
+                      placeholder="[Your Name/Organization]"
+                      className="w-full text-center p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-gold"
+                    />
+                  </div>
+                </div>
+              </PageWrapper>
+
+              {/* TOC */}
+              <PageWrapper id="toc">
+                <Header title="Table of Contents" />
+                <ul className="space-y-3">
+                  {sections
+                    .filter((s) => s.id !== "cover" && s.id !== "toc")
+                    .map((s) => (
+                      <li key={`toc-${s.id}`} className="flex items-center">
+                        <a
+                          className="flex items-center gap-3 text-lg font-semibold text-pmi-blue hover:underline"
+                          href={`#${s.id}`}
+                          onClick={() => setCurrentPage(s.id)}
+                        >
+                          <s.icon className="text-pmi-gold" /> {s.title}
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </PageWrapper>
+
+              {/* Eligibility */}
+              <PageWrapper id="eligibility">
+                <Header title="1. PMP Exam Requirements and Eligibility" />
+                <p className="text-gray-600 mb-4">
+                  According to the PMP Handbook, a project is a{" "}
+                  <b className="font-semibold">
+                    temporary endeavor undertaken to create a unique product,
+                    service, or result.
+                  </b>{" "}
+                  To be eligible for the PMP exam, you must demonstrate a
+                  specific number of months of non-overlapping, professional
+                  project management experience, in addition to formal project
+                  management education.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 3–6
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-3">
+                  Eligibility Checklist
+                </h3>
+                <div className="overflow-x-auto border rounded-lg mb-6">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Requirement
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Your Status
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Notes & Details
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>Education:</b> Secondary diploma (or global
+                          equivalent)
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="eduSecondaryChecked"
+                              type="checkbox"
+                              name="eduSecondaryChecked"
+                              checked={!!formData.eduSecondaryChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label
+                              htmlFor="eduSecondaryChecked"
+                              className="ml-2"
+                            >
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <input
+                            name="eduSecondaryType"
+                            value={formData.eduSecondaryType}
+                            onChange={handleInputChange}
+                            placeholder="Degree Type"
+                            className="w-full p-1 border border-gray-300 rounded"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>Experience:</b> 60 months of non-overlapping
+                          experience
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="exp60MonthsChecked"
+                              type="checkbox"
+                              name="exp60MonthsChecked"
+                              checked={!!formData.exp60MonthsChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label
+                              htmlFor="exp60MonthsChecked"
+                              className="ml-2"
+                            >
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Total Months:{" "}
+                          <input
+                            name="exp60MonthsTotal"
+                            value={formData.exp60MonthsTotal || ""}
+                            onChange={handleInputChange}
+                            className="ml-2 p-1 border rounded w-28"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>Education:</b> Four-year degree (or global
+                          equivalent)
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="eduFourYearChecked"
+                              type="checkbox"
+                              name="eduFourYearChecked"
+                              checked={!!formData.eduFourYearChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label
+                              htmlFor="eduFourYearChecked"
+                              className="ml-2"
+                            >
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700"></td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>Experience:</b> 36 months of non-overlapping
+                          experience
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="exp36MonthsChecked"
+                              type="checkbox"
+                              name="exp36MonthsChecked"
+                              checked={!!formData.exp36MonthsChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label
+                              htmlFor="exp36MonthsChecked"
+                              className="ml-2"
+                            >
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Total Months:{" "}
+                          <input
+                            name="exp36MonthsTotal"
+                            value={formData.exp36MonthsTotal || ""}
+                            onChange={handleInputChange}
+                            className="ml-2 p-1 border rounded w-28"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>Project Management Education:</b> 35 contact hours
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="edu35HoursChecked"
+                              type="checkbox"
+                              name="edu35HoursChecked"
+                              checked={!!formData.edu35HoursChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label htmlFor="edu35HoursChecked" className="ml-2">
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Course/Provider:{" "}
+                          <input
+                            name="edu35Course"
+                            value={formData.edu35Course || ""}
+                            onChange={handleInputChange}
+                            className="ml-2 p-1 border rounded w-56"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>OR</b> Active CAPM® Certification
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <div className="flex items-center">
+                            <input
+                              id="capmChecked"
+                              type="checkbox"
+                              name="capmChecked"
+                              checked={!!formData.capmChecked}
+                              onChange={handleInputChange}
+                              className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                            />
+                            <label htmlFor="capmChecked" className="ml-2">
+                              Yes
+                            </label>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          CAPM #:{" "}
+                          <input
+                            name="capmNumber"
+                            value={formData.capmNumber || ""}
+                            onChange={handleInputChange}
+                            className="ml-2 p-1 border rounded w-44"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Reflection & Notes
+                </h3>
+                <textarea
+                  name="eligibilityNotes"
+                  value={formData.eligibilityNotes}
+                  onChange={handleInputChange}
+                  rows="4"
+                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue mb-8"
+                  placeholder="Questions about your eligibility? Which path do you fit? How will you meet missing requirements?"
+                />
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Project Application Worksheet
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Use this to draft project entries for your PMP application.
+                </p>
+                <div className="space-y-4 p-6 border border-gray-200 rounded-lg shadow-sm">
+                  <h4 className="text-xl font-bold text-pmi-blue">Project 1</h4>
+                  {[
+                    { label: "Project Title", name: "projectTitle1" },
+                    {
+                      label: "Dates (MM/YYYY to MM/YYYY)",
+                      name: "projectDates1",
+                    },
+                    { label: "Organization", name: "projectOrganization1" },
+                    {
+                      label: "Methodology (Predictive/Agile/Hybrid)",
+                      name: "projectMethodology1",
+                    },
+                    { label: "Team Size", name: "projectTeamSize1" },
+                    { label: "Budget (Approx.)", name: "projectBudget1" },
+                    {
+                      label: "Project Objective",
+                      name: "projectObjective1",
+                      type: "textarea",
+                    },
+                    {
+                      label: "Your Role (led, directed, managed)",
+                      name: "yourRole1",
+                      type: "textarea",
+                    },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label
+                        className="block text-gray-700 font-semibold mb-1"
+                        htmlFor={f.name}
+                      >
+                        {f.label}
+                      </label>
+                      {f.type === "textarea" ? (
+                        <textarea
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          rows="3"
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      ) : (
+                        <input
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  <h5 className="text-lg font-bold text-pmi-gold">
+                    Responsibilities by Process Group
+                  </h5>
+                  {[
+                    {
+                      label: "Initiating",
+                      name: "pgInitiating1",
+                      ph: "Define charter, identify stakeholders, secure authorization.",
+                    },
+                    {
+                      label: "Planning",
+                      name: "pgPlanning1",
+                      ph: "Develop PM plan, define scope, schedule, budget, risks.",
+                    },
+                    {
+                      label: "Executing",
+                      name: "pgExecuting1",
+                      ph: "Lead team, manage communications & stakeholders.",
+                    },
+                    {
+                      label: "Monitoring & Controlling",
+                      name: "pgMonitoringControlling1",
+                      ph: "Track progress, manage risks/issues, change control.",
+                    },
+                    {
+                      label: "Closing",
+                      name: "pgClosing1",
+                      ph: "Obtain acceptance, transition deliverables, archive docs.",
+                    },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label
+                        className="block text-gray-700 font-semibold mb-1"
+                        htmlFor={f.name}
+                      >
+                        {f.label}
+                      </label>
+                      <textarea
+                        id={f.name}
+                        name={f.name}
+                        value={formData[f.name]}
+                        onChange={handleInputChange}
+                        rows="3"
+                        placeholder={f.ph}
+                        className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                      />
+                    </div>
+                  ))}
+
+                  {[
+                    {
+                      label: "Outcome/Deliverables",
+                      name: "outcomeDeliverables1",
+                      type: "textarea",
+                    },
+                    { label: "Supervisor's Name", name: "supervisorName1" },
+                    {
+                      label: "Supervisor's Email/Phone",
+                      name: "supervisorContact1",
+                    },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label
+                        className="block text-gray-700 font-semibold mb-1"
+                        htmlFor={f.name}
+                      >
+                        {f.label}
+                      </label>
+                      {f.type === "textarea" ? (
+                        <textarea
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          rows="3"
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      ) : (
+                        <input
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  <h4 className="text-xl font-bold text-pmi-blue">
+                    Reflection & Notes
+                  </h4>
+                  <textarea
+                    name="projectReflection1"
+                    value={formData.projectReflection1}
+                    onChange={handleInputChange}
+                    rows="4"
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                    placeholder="How does this project show leadership? What challenges did you overcome?"
+                  />
+                </div>
+              </PageWrapper>
+
+              {/* Audits */}
+              <PageWrapper id="audits">
+                <Header title="2. Surviving Application Audits" />
+                <p className="text-gray-600 mb-4">
+                  PMI audits ~10% of applications to verify
+                  experience/education. It is a quality process, not punitive.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 12–15
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-3">
+                  Audit Readiness Checklist
+                </h3>
+                <div className="overflow-x-auto border rounded-lg mb-6">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Document
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Notes
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {[
+                        {
+                          key: "auditSupervisorFormsChecked",
+                          label: "Signed Supervisor Forms",
+                          hint: "Have supervisor contact info ready.",
+                        },
+                        {
+                          key: "auditEducationCertificatesChecked",
+                          label: "Education Certificates",
+                          hint: "Diploma/degree certificate.",
+                        },
+                        {
+                          key: "audit35HourCertificateChecked",
+                          label: "35-Hour Training Certificate",
+                          hint: "From authorized provider.",
+                        },
+                        {
+                          key: "auditCapmCertificateChecked",
+                          label: "CAPM® (if applicable)",
+                          hint: "Your active certificate.",
+                        },
+                        {
+                          key: "auditCompleteApplicationChecked",
+                          label: "Complete Application Details",
+                          hint: "Review entries for accuracy.",
+                        },
+                      ].map((row) => (
+                        <tr key={row.key}>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            {row.label}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            <div className="flex items-center">
+                              <input
+                                id={row.key}
+                                type="checkbox"
+                                name={row.key}
+                                checked={!!formData[row.key]}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                              />
+                              <label htmlFor={row.key} className="ml-2">
+                                Ready
+                              </label>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {row.hint}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Reflection & Notes
+                </h3>
+                <textarea
+                  name="auditNotes"
+                  value={formData.auditNotes}
+                  onChange={handleInputChange}
+                  rows="4"
+                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                  placeholder="Plan for getting signatures if audited. Where are your certificates stored?"
+                />
+              </PageWrapper>
+
+              {/* Non-Traditional */}
+              <PageWrapper id="non-traditional">
+                <Header title="3. Using Non-Traditional Experience to Qualify" />
+                <p className="text-gray-600 mb-4">
+                  Experience can include academic, volunteer, and internship
+                  projects if you led or directed work that meets PMI’s
+                  definition of a project.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 17–18
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Non-Traditional Experience Mapping
+                </h3>
+                <div className="space-y-4 p-6 border border-gray-200 rounded-lg shadow-sm">
+                  {[
+                    { label: "Project Title", name: "nTProjectTitle1" },
+                    {
+                      label: "Dates (MM/YYYY to MM/YYYY)",
+                      name: "nTProjectDates1",
+                    },
+                    {
+                      label: "Organization/Institution",
+                      name: "nTOrganization1",
+                    },
+                    {
+                      label: "Your Role",
+                      name: "nTYourRole1",
+                      type: "textarea",
+                    },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label
+                        className="block text-gray-700 font-semibold mb-1"
+                        htmlFor={f.name}
+                      >
+                        {f.label}
+                      </label>
+                      {f.type === "textarea" ? (
+                        <textarea
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          rows="3"
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      ) : (
+                        <input
+                          id={f.name}
+                          name={f.name}
+                          value={formData[f.name]}
+                          onChange={handleInputChange}
+                          className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                        />
+                      )}
+                    </div>
+                  ))}
+                  <h5 className="text-lg font-bold text-pmi-gold">
+                    Responsibilities Mapped to Process Groups
+                  </h5>
+                  {[
+                    { label: "Initiating", name: "nTPGInitiating1" },
+                    { label: "Planning", name: "nTPGPlanning1" },
+                    { label: "Executing", name: "nTPGExecuting1" },
+                    {
+                      label: "Monitoring & Controlling",
+                      name: "nTPGMonitoringControlling1",
+                    },
+                    { label: "Closing", name: "nTPGClosing1" },
+                  ].map((f) => (
+                    <div key={f.name}>
+                      <label
+                        className="block text-gray-700 font-semibold mb-1"
+                        htmlFor={f.name}
+                      >
+                        {f.label}
+                      </label>
+                      <textarea
+                        id={f.name}
+                        name={f.name}
+                        value={formData[f.name]}
+                        onChange={handleInputChange}
+                        rows="3"
+                        className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                      />
+                    </div>
+                  ))}
+                  <h4 className="text-xl font-bold text-pmi-blue">
+                    Reflection & Notes
+                  </h4>
+                  <textarea
+                    name="nTReflection1"
+                    value={formData.nTReflection1}
+                    onChange={handleInputChange}
+                    rows="4"
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                    placeholder="List other non-traditional projects. Do they meet leading/directing criteria?"
+                  />
+                </div>
+              </PageWrapper>
+
+              {/* Exam Prep */}
+              <PageWrapper id="exam-prep">
+                <Header title="4. Preparing for the Exam" />
+                <p className="text-gray-600 mb-4">
+                  PMP assesses situational judgment across People, Process, and
+                  Business Environment domains.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 19–21
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Study Plan Worksheet
+                </h3>
+                <div className="mb-4">
+                  <label
+                    htmlFor="studyPlanOption"
+                    className="block text-gray-700 font-semibold mb-2"
+                  >
+                    Choose your Study Plan
+                  </label>
+                  <select
+                    id="studyPlanOption"
+                    name="studyPlanOption"
+                    value={formData.studyPlanOption}
+                    onChange={handleInputChange}
+                    className="w-full md:w-1/2 p-2 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                  >
+                    <option value="6-week">6-Week Aggressive Plan</option>
+                    <option value="8-week">8-Week Balanced Plan</option>
+                    <option value="12-week">12-Week Relaxed Plan</option>
+                  </select>
+                </div>
+
+                <div className="overflow-x-auto border rounded-lg mb-6">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Week
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Focus Areas & Resources
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {Array.from({ length: weeksCount }).map((_, i) => (
+                        <tr key={`study-week-${i + 1}`}>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            {i + 1}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            <textarea
+                              name={`studyWeek${i + 1}`}
+                              value={formData[`studyWeek${i + 1}`] || ""}
+                              onChange={handleInputChange}
+                              rows="2"
+                              placeholder={`Plan for Week ${i + 1}`}
+                              className="w-full p-1 border border-gray-300 rounded"
+                            />
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            <div className="flex items-center">
+                              <input
+                                id={`studyWeek${i + 1}Checked`}
+                                type="checkbox"
+                                name={`studyWeek${i + 1}Checked`}
+                                checked={!!formData[`studyWeek${i + 1}Checked`]}
+                                onChange={handleInputChange}
+                                className="h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue"
+                              />
+                              <label
+                                htmlFor={`studyWeek${i + 1}Checked`}
+                                className="ml-2"
+                              >
+                                Done
+                              </label>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Reflection & Notes
+                </h3>
+                <textarea
+                  name="studyPlanReflection"
+                  value={formData.studyPlanReflection}
+                  onChange={handleInputChange}
+                  rows="4"
+                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                  placeholder="Which plan fits your schedule? Top 3 study resources?"
+                />
+              </PageWrapper>
+
+              {/* Exam Day */}
+              <PageWrapper id="exam-day">
+                <Header title="5. Exam Day" />
+                <p className="text-gray-600 mb-4">
+                  The PMP exam is 230 minutes, 180 questions, with two optional
+                  10-minute breaks. Choose test center or online proctoring.
+                  Time management & calm mindset matter.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 22–24
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Exam Day Prep Checklist
+                </h3>
+                <ul className="space-y-3 mb-6">
+                  {[
+                    {
+                      key: "examDayOnlineChecked",
+                      text: (
+                        <>
+                          <b>Online Proctored:</b> Check tech, quiet room,
+                          stable internet.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayInPersonChecked",
+                      text: (
+                        <>
+                          <b>In-Person Center:</b> Confirm location, travel,
+                          parking.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayValidIdChecked",
+                      text: (
+                        <>
+                          <b>Valid ID:</b> Bring required identification.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayConfirmationEmailChecked",
+                      text: (
+                        <>
+                          <b>Confirmation Email:</b> Keep a copy handy.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayGoodSleepChecked",
+                      text: <>Get a good night’s sleep.</>,
+                    },
+                    {
+                      key: "examDayHealthyBreakfastChecked",
+                      text: <>Eat a healthy breakfast.</>,
+                    },
+                    {
+                      key: "examDayManageTimeChecked",
+                      text: (
+                        <>
+                          <b>Manage time:</b> ~1.25 minutes per question.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayTakeBreaksChecked",
+                      text: (
+                        <>
+                          <b>Take breaks:</b> Use both 10‑min breaks.
+                        </>
+                      ),
+                    },
+                    {
+                      key: "examDayTrustInstinctsChecked",
+                      text: (
+                        <>
+                          <b>Trust your instincts:</b> Don’t overthink.
+                        </>
+                      ),
+                    },
+                  ].map((item) => (
+                    <li key={item.key} className="flex items-start">
+                      <input
+                        id={item.key}
+                        type="checkbox"
+                        name={item.key}
+                        checked={!!formData[item.key]}
+                        onChange={handleInputChange}
+                        className="mt-1 h-4 w-4 text-pmi-gold border-gray-300 rounded focus:ring-pmi-blue mr-2"
+                      />
+                      <label htmlFor={item.key} className="text-gray-700">
+                        {item.text}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Reflection & Notes
+                </h3>
+                <textarea
+                  name="examDayReflection"
+                  value={formData.examDayReflection}
+                  onChange={handleInputChange}
+                  rows="4"
+                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                  placeholder="Your plan for time & stress. Items to bring for breaks."
+                />
+              </PageWrapper>
+
+              {/* Bonus */}
+              <PageWrapper id="bonus">
+                <Header title="6. Bonus: Certification Comparison, Resources & FAQs" />
+                <p className="text-gray-600 mb-4">
+                  Understanding certification differences helps you chart your
+                  path.
+                </p>
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 25–27
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Certification Comparison
+                </h3>
+                <div className="overflow-x-auto border rounded-lg mb-6">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Certification
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Focus
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Target Audience
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>PMP®</b>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Leadership & direction across methodologies.
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Experienced professionals.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>CAPM®</b>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Foundational PM knowledge & terminology.
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Entry-level or team members.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>PRINCE2®</b>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Process-based, controlled environments.
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          PRINCE2-centric orgs.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <b>PMI-ACP®</b>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Agile principles & practices.
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          Agile/Hybrid environments.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2">
+                  Frequently Asked Questions
+                </h3>
+                <div className="space-y-3 text-gray-700">
+                  <p>
+                    <b>Q:</b> How long does PMP application review take?
+                  </p>
+                  <p>
+                    <b>A:</b> Online applications are typically reviewed
+                    immediately; audits add time.
+                  </p>
+                  <p>
+                    <b>Q:</b> How often does the exam change?
+                  </p>
+                  <p>
+                    <b>A:</b> The Exam Content Outline (ECO) is updated
+                    periodically to reflect practice changes.
+                  </p>
+                </div>
+
+                <h3 className="text-2xl font-semibold text-pmi-gold mb-2 mt-6">
+                  Reflection & Notes
+                </h3>
+                <textarea
+                  name="bonusReflection"
+                  value={formData.bonusReflection}
+                  onChange={handleInputChange}
+                  rows="4"
+                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-pmi-blue"
+                  placeholder="Open questions to research later."
+                />
+              </PageWrapper>
+
+              {/* Appendix */}
+              <PageWrapper id="appendix">
+                <Header title="7. Appendix: Links" />
+                <div className="text-right text-sm italic text-pmi-gold mb-6">
+                  Maps to Slides 28–32
+                </div>
+
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-center">
+                    <Users className="mr-3 text-pmi-gold" />
+                    <a
+                      className="text-pmi-blue underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.pmi.org/-/media/pmi/documents/public/pdf/certifications/pmp-handbook.pdf"
+                    >
+                      <b>PMP Handbook:</b> Official eligibility & application
+                      guide.
+                    </a>
+                  </li>
+                  <li className="flex items-center">
+                    <FileText className="mr-3 text-pmi-gold" />
+                    <a
+                      className="text-pmi-blue underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.pmi.org/-/media/pmi/documents/public/pdf/certifications/pmp-examination-content-outline.pdf"
+                    >
+                      <b>Exam Content Outline (ECO):</b> Domain percentages &
+                      tasks.
+                    </a>
+                  </li>
+                  <li className="flex items-center">
+                    <ClipboardList className="mr-3 text-pmi-gold" />
+                    <a
+                      className="text-pmi-blue underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.pmi.org/certifications/project-management-pmp/PMP-Application-Process/apply-for-pmp"
+                    >
+                      <b>PMP Application Portal</b>
+                    </a>
+                  </li>
+                  <li className="flex items-center">
+                    <BookOpen className="mr-3 text-pmi-gold" />
+                    <a
+                      className="text-pmi-blue underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.pmi.org/certifications/project-management-pmp/pmp-exam-prep/study-hall"
+                    >
+                      <b>PMI Study Hall™</b>
+                    </a>
+                  </li>
+                  <li className="flex items-center">
+                    <Users className="mr-3 text-pmi-gold" />
+                    <a
+                      className="text-pmi-blue underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.pmi.org/connect"
+                    >
+                      <b>PMI Community</b>
+                    </a>
+                  </li>
+                </ul>
+
+                <p className="text-xs text-gray-500 italic mt-8">
+                  <b>Disclaimer:</b> This workbook complements PMP Blueprint™
+                  training and aligns to PMI resources. Always defer to the PMP
+                  Handbook & ECO for the latest details.
+                </p>
+              </PageWrapper>
+            </main>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
